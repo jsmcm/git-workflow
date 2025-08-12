@@ -1,0 +1,37 @@
+services:
+    app:
+        image: ghcr.io/jsmcm/git-workflow-app:latest
+        environment:
+            APACHE_RUN_USER: runtime
+            DB_USERNAME: ${PROD_DB_USERNAME}
+        depends_on:
+            - db
+        networks:
+            - net
+
+    db:
+        image: postgres:14.9
+        environment:
+            POSTGRES_USER: ${PROD_DB_USERNAME}
+            POSTGRES_DB: ${PROD_DB_DATABASE}
+            POSTGRES_PASSWORD: ${PROD_DB_PASSWORD}
+        volumes:
+            - data-smp-prod-db:/var/lib/postgresql/data
+        networks:
+            - net
+
+
+    ingress:
+        restart: always
+        image: cloudflare/cloudflared:latest
+        command: tunnel --no-autoupdate run --token ${PROD_CLOUDFLARE_TUNNEL_TOKEN}
+        networks:
+            - net
+        depends_on:
+            - app
+
+networks:
+    net:
+
+volumes:
+    data-smp-prod-db:
