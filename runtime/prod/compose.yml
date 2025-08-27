@@ -1,9 +1,25 @@
 services:
     app:
+        restart: always
         image: ghcr.io/jsmcm/git-workflow-app:latest
+        ports:
+            - "80:80"
         environment:
             APACHE_RUN_USER: runtime
             DB_USERNAME: ${PROD_DB_USERNAME}
+            DB_DATABASE: ${PROD_DB_DATABASE}
+            DB_PASSWORD: ${PROD_DB_PASSWORD}
+            DB_CONNECTION: ${PROD_DB_CONNECTION}
+            DB_HOST: db
+            APP_ENV: production
+            APP_KEY=base64:ssBDAcp8aTM4EGk73A9Q8rkWlG5GqvoSUYT3Zn2xbQw=
+            # LOG_HOST: 1.2.3.4
+            # LOG_PORT: 0
+            QUEUE_CONNECTION: redis
+            REDIS_HOST: redis
+            VERSION: 123
+        volumes:
+            - app-storage-ghd-prod:/var/www/html
         depends_on:
             - db
         networks:
@@ -16,22 +32,23 @@ services:
             POSTGRES_DB: ${PROD_DB_DATABASE}
             POSTGRES_PASSWORD: ${PROD_DB_PASSWORD}
         volumes:
-            - data-smp-prod-db:/var/lib/postgresql/data
+            - data-ghd-prod-db:/var/lib/postgresql/data
         networks:
             - net
 
 
-    ingress:
-        restart: always
-        image: cloudflare/cloudflared:latest
-        command: tunnel --no-autoupdate run --token ${PROD_CLOUDFLARE_TUNNEL_TOKEN}
-        networks:
-            - net
-        depends_on:
-            - app
+    # ingress:
+    #     restart: always
+    #     image: cloudflare/cloudflared:latest
+    #     command: tunnel --no-autoupdate run --token ${PROD_CLOUDFLARE_TUNNEL_TOKEN}
+    #     networks:
+    #         - net
+    #     depends_on:
+    #         - app
 
 networks:
     net:
 
 volumes:
-    data-smp-prod-db:
+    data-ghd-prod-db:
+    app-storage-ghd-prod:
