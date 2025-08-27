@@ -12,14 +12,15 @@ services:
             DB_CONNECTION: ${PROD_DB_CONNECTION}
             DB_HOST: db
             APP_ENV: production
-            APP_KEY=base64:ssBDAcp8aTM4EGk73A9Q8rkWlG5GqvoSUYT3Zn2xbQw=
+            APP_KEY: base64:ssBDAcp8aTM4EGk73A9Q8rkWlG5GqvoSUYT3Zn2xbQw=
             # LOG_HOST: 1.2.3.4
             # LOG_PORT: 0
             QUEUE_CONNECTION: redis
             REDIS_HOST: redis
             VERSION: 123
         volumes:
-            - app-storage-ghd-prod:/var/www/html
+            - app-storage-ghd-prod:/var/www/html/storage
+            - app_cache:/var/www/html/bootstrap/cache
         depends_on:
             - db
         networks:
